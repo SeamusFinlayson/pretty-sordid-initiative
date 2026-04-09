@@ -162,50 +162,47 @@ export function ZipperInitiative({ role }: { role: "PLAYER" | "GM" }) {
     }
   }
 
-  function handleReadyChange(id: string, ready: boolean, previousId: string) {
+  function handleReadyChange(id: string, ready: boolean) {
+    const previousId =
+      previousStack.length > 1
+        ? (previousStack.at(previousStack.length - 2) as string)
+        : "";
+    const currentActiveId =
+      previousStack.length > 0
+        ? (previousStack.at(previousStack.length - 1) as string)
+        : "";
+    const isCurrentActive = currentActiveId === id;
     const isNewActive = !ready;
+
     // Set local items immediately and update previous stack
     setInitiativeItems((prev) =>
       prev.map((item) => {
-        if (item.id === id) {
-          // Highlight ready item on map
-          if (selectActiveItem === 1 && isNewActive) selectItem(item.id);
-          if (selectActiveItem === 2 && isNewActive) labelItem(item.id);
-
-          // Update item locally
-          return {
-            ...item,
-            ready: ready,
-            active: isNewActive,
-          };
+        if (isNewActive) {
+          if (item.id === id) {
+            // Highlight ready item on map
+            if (selectActiveItem === 1) selectItem(item.id);
+            if (selectActiveItem === 2) labelItem(item.id);
+            return { ...item, ready: false, active: true };
+          } else {
+            // Set other
+            return { ...item, active: false };
+          }
         } else {
-          // Update item locally
-          return { ...item, active: false };
-        }
-      }),
-    );
-
-    if (isNewActive) {
-      // Record that this item went at this point
-      const newPreviousStack = [...previousStack, id];
-      setPreviousStack(newPreviousStack);
-      writePreviousStackToScene(newPreviousStack);
-    } else {
-      // Restore previous initiative item
-      const newPreviousStack = previousStack.slice(0, -1);
-      setPreviousStack(newPreviousStack);
-      writePreviousStackToScene(newPreviousStack);
-      if (newPreviousStack.length === 0) removeLabel();
-      setInitiativeItems((prev) =>
-        prev.map((item) => {
-          if (item.id === previousId) {
+          if (item.id === previousId && isCurrentActive) {
+            // Restore previous item highlight and active
             if (selectActiveItem === 1) selectItem(item.id);
             if (selectActiveItem === 2) labelItem(item.id);
             return { ...item, active: true };
-          } else return { ...item };
-        }),
-      );
-    }
+          } else if (item.id === id) {
+            // Re-ready click target
+            return { ...item, ready: true, active: false };
+          } else {
+            // Set other
+            return { ...item };
+          }
+        }
+      }),
+    );
 
     // Sync item changes over the network
     OBR.scene.items.updateItems(
@@ -214,18 +211,36 @@ export function ZipperInitiative({ role }: { role: "PLAYER" | "GM" }) {
         for (const item of items) {
           const metadata = item.metadata[getPluginId("metadata")];
           if (isMetadata(metadata)) {
-            if (item.id === id) {
-              metadata.ready = ready;
-              metadata.active = isNewActive;
-            } else if (!isNewActive && item.id === previousId) {
-              metadata.active = true;
+            if (isNewActive) {
+              if (item.id === id) {
+                metadata.ready = false;
+                metadata.active = true;
+              } else {
+                metadata.active = false;
+              }
             } else {
-              metadata.active = false;
+              if (item.id === previousId && isCurrentActive) {
+                metadata.active = true;
+              } else if (item.id === id) {
+                metadata.ready = true;
+                metadata.active = false;
+                // Re-ready click target
+              }
             }
           }
         }
       },
     );
+
+    // Update scene with previous values
+    const newPreviousStack = isNewActive
+      ? [...previousStack, id]
+      : isCurrentActive
+        ? previousStack.slice(0, -1)
+        : previousStack.filter((val) => val !== id);
+    setPreviousStack(newPreviousStack);
+    writePreviousStackToScene(newPreviousStack);
+    if (newPreviousStack.length === 0) removeLabel();
   }
 
   const roundFinished =
@@ -423,15 +438,7 @@ export function ZipperInitiative({ role }: { role: "PLAYER" | "GM" }) {
                     key={item.id}
                     item={item}
                     onReadyChange={(ready) => {
-                      handleReadyChange(
-                        item.id,
-                        ready,
-                        previousStack.length > 1
-                          ? (previousStack.at(
-                              previousStack.length - 2,
-                            ) as string)
-                          : "",
-                      );
+                      handleReadyChange(item.id, ready);
                     }}
                     showHidden={role === "GM"}
                     edit={editMode}
@@ -447,15 +454,7 @@ export function ZipperInitiative({ role }: { role: "PLAYER" | "GM" }) {
                     key={item.id}
                     item={item}
                     onReadyChange={(ready) => {
-                      handleReadyChange(
-                        item.id,
-                        ready,
-                        previousStack.length > 1
-                          ? (previousStack.at(
-                              previousStack.length - 2,
-                            ) as string)
-                          : "",
-                      );
+                      handleReadyChange(item.id, ready);
                     }}
                     showHidden={role === "GM"}
                     edit={editMode}

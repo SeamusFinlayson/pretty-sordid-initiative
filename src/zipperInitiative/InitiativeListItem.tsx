@@ -52,6 +52,9 @@ export function InitiativeListItem({
     event.target.select();
   };
 
+  const iconDim =
+    (item.group === 1 && !roleIsGm) || (!item.active && !item.ready);
+
   return (
     <ListItem
       ref={setNodeRef}
@@ -70,8 +73,14 @@ export function InitiativeListItem({
             </button>
           ) : (
             <Checkbox
-              checkedIcon={<FlagRoundedIcon></FlagRoundedIcon>}
-              icon={<OutlinedFlagRoundedIcon></OutlinedFlagRoundedIcon>}
+              checkedIcon={
+                <FlagRoundedIcon style={{ opacity: iconDim ? 0.5 : 1 }} />
+              }
+              icon={
+                <OutlinedFlagRoundedIcon
+                  style={{ opacity: iconDim ? 0.5 : 1 }}
+                />
+              }
               checked={item.ready}
               onFocus={(evt) => {
                 handleFocus(evt);
@@ -79,9 +88,6 @@ export function InitiativeListItem({
               value={item.count}
               onChange={(e) => onReadyChange(e.target.checked)}
               onDoubleClick={(e) => e.stopPropagation()}
-              disabled={
-                (item.group === 1 && !roleIsGm) || (!item.active && !item.ready)
-              }
             />
           )}
         </>
