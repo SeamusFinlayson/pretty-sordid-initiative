@@ -5,17 +5,13 @@ import { PluginGate } from "../components/PluginGate";
 import { PluginThemeProvider } from "../components/PluginThemeProvider";
 import "../index.css";
 import "./style.css";
-import {
-  broadcastRoundChangeEventMessage,
-  handleSetRoundNumberMessage,
-} from "../helpers/broadcastRoundImplementation";
+import { handleSetRoundNumberMessage } from "../helpers/broadcastRoundImplementation";
 import { updateRoundCount } from "../helpers/metadataHelpers";
 import OBR from "@owlbear-rodeo/sdk";
 
 OBR.onReady(() => {
   handleSetRoundNumberMessage((data) => {
     updateRoundCount(data.roundNumber, () => {});
-    broadcastRoundChangeEventMessage(data.roundNumber);
   });
 });
 

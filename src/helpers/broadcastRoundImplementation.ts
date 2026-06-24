@@ -40,6 +40,7 @@ export function handleSetRoundNumberMessage(
 ) {
   return OBR.broadcast.onMessage(SET_ROUND_CHANNEL, (event) => {
     const data = event.data as SetRoundData;
+    broadcastRoundChangeEventMessage(data.roundNumber);
     callback(data);
   });
 }
