@@ -6,7 +6,7 @@ image: https://github.com/SeamusFinlayson/initiative-tracker/assets/77430559/18b
 icon: https://github.com/SeamusFinlayson/initiative-tracker/assets/77430559/fbab4357-4c5e-45af-a2d6-a83cf30c7ae8
 tags:
   - combat
-manifest: https://pretty-initiative.onrender.com/manifest.json
+manifest: https://pretty-sordid.seamus-finlayson.ca/manifest.json
 learn-more: https://github.com/SeamusFinlayson/initiative-tracker
 ---
 
