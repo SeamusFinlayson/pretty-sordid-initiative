@@ -4,12 +4,12 @@
   "manifest_version": 1,
   "author": "Seamus Finlayson",
   "homepage_url": "https://github.com/SeamusFinlayson/initiative-tracker",
-  "icon": "/logo.png",
+  "icon": "https://pretty-sordid.seamus-finlayson.ca/logo.png",
   "description": "Initiative tracking with token icons and a sort button!",
   "action": {
     "title": "Pretty Sordid",
-    "icon": "/icon.svg",
-    "popover": "/src/action/action.html",
+    "icon": "https://pretty-sordid.seamus-finlayson.ca/icon.svg",
+    "popover": "https://pretty-sordid.seamus-finlayson.ca/src/action/action.html",
     "height": 129,
     "width": 250
   }
